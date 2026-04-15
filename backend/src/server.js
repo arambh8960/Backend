@@ -1,11 +1,26 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import connectDB from './db/server.js';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+
+
 
 // Load env variables
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+  origin:process.env.CORS_ORIGIN,
+  credentials:true
+}))
+
+app.use(express.json({limit:"16kb"}))
+app.use(express.urlencoded({extended:true,limit:"16kb"}))
+app.use(express.static("public"))
+app.use(cookieParser())
+
 const port = process.env.PORT || 3000;
 
 // Minimal health endpoint
