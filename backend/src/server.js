@@ -21,12 +21,18 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+
+//import route
+import userRouter from './routes/user.routes.js'
+
 const port = process.env.PORT || 3000;
 
 // Minimal health endpoint
 app.get('/', (req, res) => {
   res.send(`Server is running on port ${port}`);
 });
+
+app.use("/api/v1/users",userRouter);
 
 const start = async () => {
   try {
