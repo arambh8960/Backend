@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
    console.log("email", email);
 
-   res.json({fullName, email, username, password })
+
 //    if(fullName==""){
 //     throw new ApiError(400,"passsword is rrequired");
 //    } ya to ek ek karke aise chek kar le if conditon laga ke ya fir direct  niche wale tariek se karle ek bar me
@@ -28,17 +28,21 @@ if(existedUser) {
     throw new ApiError(409, "User with email or username already exists");
 }
 
-const avatarLocalPath=req.files?.avatar[0]?.path;
-const coverImageLocalPath=req.files?.coverImage[0]?.path;
+const avatarLocalPath = req.files?.avatar?.[0]?.path;
+const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 if(!avatarLocalPath){
     throw new ApiError(400,"Avatar file is required");
 }
+console.log("Uploading avatar from:", avatarLocalPath);
 
 const avatar=await uploadOnCloudinary(avatarLocalPath);
 const coverImage= await uploadOnCloudinary(coverImageLocalPath);
-if(!avatar){
-    throw new ApiError(400,"Avatar file is required"); 
+
+console.log("Uploaded URL:", avatar.secure_url);
+if (!avatar) {
+    throw new ApiError(400, "Error while uploading avatar to Cloudinary");
 }
+
 
 const user=await User.create({
     fullName,

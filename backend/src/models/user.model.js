@@ -33,7 +33,7 @@ const userSchema=new mongoose.Schema({
         required:true,
   
     },
-    coverimage:{
+    coverImage:{
 
          type:String,//cloudinary url
 
@@ -57,31 +57,30 @@ const userSchema=new mongoose.Schema({
     
 },{timestamps:true})
 
-userSchema.pre("save", async function (next) {//password ko encrypt karne ke lie
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
 
-    if(!this.isModified("password")) return next();
-    this.password=bcrypt.hash(this.password,10)
-    next()
-
-})
+    this.password = await bcrypt.hash(this.password, 10);
+});
 
 userSchema.methods.isPasswordCorrect=async function (password) {
     return await bcrypt.compare(password,this.password)
      
 }
-userSchema.methods.genrateAccessToken=function(){
-    jwt.sign({
-        _id:this._id,
-        email:this.email,
-        username:this.username,
-        fullName:this.fullName
-    })
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
-
-    }
-}
+userSchema.methods.genrateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            fullName: this.fullName
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    );
+};
 userSchema.methods.genrateRefreshToken=function(){
     jwt.sign({
         _id:this._id,
